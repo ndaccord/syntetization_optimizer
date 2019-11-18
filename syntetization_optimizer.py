@@ -1,4 +1,5 @@
 import sys
+import numpy
 
 # Run optimize_one_sequence multiple times until all subsequences have a score below threshold
 def opt(dna_sequence, threshold, min_length):
@@ -17,7 +18,6 @@ def opt(dna_sequence, threshold, min_length):
             else:
                 new_cut_list.append(cut)
         cut_list = new_cut_list[:]
-        print(cut_list)
 
     l = 0
     for cut in cut_list:
@@ -43,6 +43,8 @@ def optimize_one_sequence(cut_to_optimize, min_length):
 
     return best_cut
 
+
+
 # Return False if all sequences' scores are below the threshold, True otherwise
 def is_cut_list_unoptimized(cut_list, threshold, min_length):
     for cut in cut_list:
@@ -52,22 +54,30 @@ def is_cut_list_unoptimized(cut_list, threshold, min_length):
 
 
 
-
-
 # Compute the composite sequence score based on multiple parameters
 def compute_sequence_score(dna_sequence):
 
     gc_content_score = compute_gc_content(dna_sequence)
-    composite_score = gc_content_score
+    length_score = compute_length_score(dna_sequence)
+
+    composite_score = gc_content_score * length_score
+
+    print(gc_content_score)
+    print(length_score)
+
     return composite_score
 
 
-
+# Compute the length score of the sequence
+def compute_length_score(dna_sequence):
+    length_score = numpy.arctan( len(dna_sequence) / 200 )
+    return length_score
 
 # Compute the GC content of a dna sequence
 def compute_gc_content(dna_sequence):
-    #return dna_sequence.count("G")
-    return float(dna_sequence.count("G") + dna_sequence.count("C")) / float(len(dna_sequence)) * 100.
+    gc_content = float(dna_sequence.count("G") + dna_sequence.count("C")) / float(len(dna_sequence)) * 100.
+    gc_content_score = numpy.arctan( (gc_content - 50) / 10 ) * 20
+    return gc_content_score
 
 
 
